@@ -114,10 +114,13 @@ class _HomePageState extends State<HomePage> {
                 builder: (context, state) {
                   return InkWell(
                     onTap: () async {
+                      ScaffoldMessenger.of(context).hideCurrentMaterialBanner();
                       _homeBloc.add(PickFileEvent());
                     },
                     child: DropTarget(
                       onDragDone: (details) {
+                        ScaffoldMessenger.of(context)
+                            .hideCurrentMaterialBanner();
                         _homeBloc
                             .add(UploadDropFileEvent(droppedDetails: details));
                       },
