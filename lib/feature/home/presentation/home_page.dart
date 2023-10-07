@@ -40,163 +40,167 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
+        leading: const SizedBox.shrink(),
         title: const Text("Upload Document"),
       ),
       body: Padding(
         padding: const EdgeInsets.all(10.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(
-              height: 10,
-            ),
-            _getTitle("Description"),
-            const SizedBox(
-              height: 10,
-            ),
-            Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: Colors.grey),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(
+                height: 10,
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  ClipRRect(
-                    borderRadius:
-                        const BorderRadius.vertical(top: Radius.circular(10)),
-                    child: Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(8.0),
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                        border: Border(
-                          bottom: BorderSide(
-                            color: Colors.grey,
-                            width: 1,
+              _getTitle("Description"),
+              const SizedBox(
+                height: 10,
+              ),
+              Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: Colors.grey),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ClipRRect(
+                      borderRadius:
+                          const BorderRadius.vertical(top: Radius.circular(10)),
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(8.0),
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          border: Border(
+                            bottom: BorderSide(
+                              color: Colors.grey,
+                              width: 1,
+                            ),
+                          ),
+                        ),
+                        child: _buildTextFormatterSection(),
+                      ),
+                    ),
+                    BlocBuilder<TextDescriptionBloc, TextDescriptionState>(
+                      builder: (context, state) {
+                        if (state is ChangeTextDescriptionStyleState) {
+                          currentText = state.text;
+                        }
+
+                        return AppTextField(
+                          controller: _descriptionTextController,
+                          maxLines: 6,
+                          textStyle: currentText?.style,
+                          textAlign: currentText?.textAlign,
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              _getTitle("Content Upload*"),
+              const SizedBox(
+                height: 10,
+              ),
+              BlocConsumer<HomeBloc, HomeState>(
+                listener: (context, state) {
+                  _handleUserNotification(state, context);
+                },
+                builder: (context, state) {
+                  return InkWell(
+                    onTap: () async {
+                      _homeBloc.add(PickFileEvent());
+                    },
+                    child: DropTarget(
+                      onDragDone: (details) {
+                        _homeBloc
+                            .add(UploadDropFileEvent(droppedDetails: details));
+                      },
+                      onDragEntered: (details) {
+                        debugPrint("onDragEntered $details}");
+                      },
+                      child: DottedBorder(
+                        strokeWidth: 1.5,
+                        color: Colors.grey,
+                        radius: const Radius.circular(10),
+                        borderType: BorderType.RRect,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: Container(
+                            height: 100,
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              color: AppColors.color5f8fe,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                if (state is DocUploadInProgressState ||
+                                    state is DownloadInProgressState)
+                                  const CircularProgressIndicator()
+                                else if (state is DocUploadSuccessfulState) ...[
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Flexible(
+                                        child: Text(
+                                          "File : ${state.fileName}",
+                                          maxLines: 1,
+                                        ),
+                                      ),
+                                      AppIconButton(
+                                        onPresed: () {
+                                          _homeBloc.add(ResetHomeBlocEvent());
+                                        },
+                                        icon: Icons.delete,
+                                      )
+                                    ],
+                                  )
+                                ] else ...[
+                                  const Icon(
+                                    Icons.upload_file_outlined,
+                                    color: Colors.red,
+                                  ),
+                                  const SizedBox(
+                                    height: 10,
+                                  ),
+                                  const Text(
+                                    "Drop your document here, or click to browse",
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                    ),
+                                  )
+                                ]
+                              ],
+                            ),
                           ),
                         ),
                       ),
-                      child: _buildTextFormatterSection(),
+                    ),
+                  );
+                },
+              ),
+              const Row(
+                children: [
+                  Text(
+                    "Allow user to download content",
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 14,
                     ),
                   ),
-                  BlocBuilder<TextDescriptionBloc, TextDescriptionState>(
-                    builder: (context, state) {
-                      if (state is ChangeTextDescriptionStyleState) {
-                        currentText = state.text;
-                      }
-
-                      return AppTextField(
-                        controller: _descriptionTextController,
-                        maxLines: 6,
-                        textStyle: currentText?.style,
-                        textAlign: currentText?.textAlign,
-                      );
-                    },
-                  ),
+                  AppSwitch(initialSwitchValue: true),
                 ],
               ),
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            _getTitle("Content Upload*"),
-            const SizedBox(
-              height: 10,
-            ),
-            BlocConsumer<HomeBloc, HomeState>(
-              listener: (context, state) {
-                _handleUserNotification(state, context);
-              },
-              builder: (context, state) {
-                return InkWell(
-                  onTap: () async {
-                    _homeBloc.add(PickFileEvent());
-                  },
-                  child: DropTarget(
-                    onDragDone: (details) {
-                      _homeBloc
-                          .add(UploadDropFileEvent(droppedDetails: details));
-                    },
-                    onDragEntered: (details) {
-                      debugPrint("onDragEntered $details}");
-                    },
-                    child: DottedBorder(
-                      strokeWidth: 1.5,
-                      color: Colors.grey,
-                      radius: const Radius.circular(10),
-                      borderType: BorderType.RRect,
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(10),
-                        child: Container(
-                          height: 100,
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            color: AppColors.color5f8fe,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              if (state is DocUploadInProgressState ||
-                                  state is DownloadInProgressState)
-                                const CircularProgressIndicator()
-                              else if (state is DocUploadSuccessfulState) ...[
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Flexible(
-                                      child: Text(
-                                        "File : ${state.fileName}",
-                                        maxLines: 1,
-                                      ),
-                                    ),
-                                    AppIconButton(
-                                      onPresed: () {
-                                        _homeBloc.add(ResetHomeBlocEvent());
-                                      },
-                                      icon: Icons.delete,
-                                    )
-                                  ],
-                                )
-                              ] else ...[
-                                const Icon(
-                                  Icons.upload_file_outlined,
-                                  color: Colors.red,
-                                ),
-                                const SizedBox(
-                                  height: 10,
-                                ),
-                                const Text(
-                                  "Drop your document here, or click to browse",
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                  ),
-                                )
-                              ]
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
-            const Row(
-              children: [
-                Text(
-                  "Allow user to download content",
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 14,
-                  ),
-                ),
-                AppSwitch(initialSwitchValue: true),
-              ],
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
