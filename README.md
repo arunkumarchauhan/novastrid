@@ -15,7 +15,7 @@ This project has been Tested on web (chrome) and android only.
 
 - Browse to upload tested on android and web(chrome)
 
--Download file have been tested on android and web(chrome)
+- Download file have been tested on android and web(chrome)
 
 
 
