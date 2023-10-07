@@ -2,9 +2,20 @@ part of 'home_bloc.dart';
 
 abstract class HomeEvent {}
 
-class FileDroppedEvent extends HomeEvent {
+class DownloadPickedFile extends HomeEvent {
   final File droppedFile;
-  FileDroppedEvent({required this.droppedFile});
+  DownloadPickedFile({required this.droppedFile});
 }
 
-class ChooseFileEvent extends HomeEvent {}
+class UploadDropFileEvent extends HomeEvent {
+  final DropDoneDetails droppedDetails;
+  UploadDropFileEvent({required this.droppedDetails});
+}
+
+class PickFileEvent extends HomeEvent {
+  PickFileEvent();
+}
+
+class ResetHomeBlocEvent extends HomeEvent {
+  ResetHomeBlocEvent();
+}
