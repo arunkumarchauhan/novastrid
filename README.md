@@ -3,6 +3,7 @@
 A new Flutter project.
 
 ## Getting Started
+### This project is just for demo purpose only So 
 
 This project has been Tested on web (chrome) and android only.
 
