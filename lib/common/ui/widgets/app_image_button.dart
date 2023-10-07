@@ -18,6 +18,7 @@ class AppImageButton extends StatelessWidget {
       child: Container(
         height: 30,
         width: 36,
+        margin: const EdgeInsets.symmetric(horizontal: 3),
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
         color: backgroundColor ?? Colors.white,
         child: Image.asset(

@@ -4,6 +4,7 @@ import 'package:desktop_drop/desktop_drop.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:novastrid/common/ui/widgets/app_icon_button.dart';
 import 'package:novastrid/common/ui/widgets/app_image_button.dart';
 import 'package:novastrid/common/ui/widgets/app_swich.dart';
@@ -13,6 +14,7 @@ import 'package:novastrid/feature/home/bloc/home_bloc/home_bloc.dart';
 import 'package:novastrid/feature/home/bloc/text_description_bloc/bloc/text_description_bloc.dart';
 import 'package:novastrid/utils/app_colors.dart';
 import 'package:novastrid/utils/assets.dart';
+import 'package:novastrid/utils/extensions.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -200,6 +202,29 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  void _showColorPickerDialogue(
+      TextDescriptionState state,
+      BuildContext context,
+      Function(Color color) onColorChanged,
+      Color defaultColor,
+      Color? selectedColor) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AboutDialog(
+          children: [
+            ColorPicker(
+              pickerColor: selectedColor ?? defaultColor,
+              onColorChanged: (value) {
+                onColorChanged(value);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   void _handleUserNotification(HomeState state, BuildContext context) {
     if (state is DocUploadSuccessfulState) {
       _showUploadDialogue(context);
@@ -379,27 +404,35 @@ class _HomePageState extends State<HomePage> {
             ),
 
             AppIconButton(
-                onPresed: () {}, icon: Icons.format_color_text_outlined),
+              iconColor: currentText?.style?.color,
+              onPresed: () {
+                _showColorPickerDialogue(state, context, (value) {
+                  _textDescriptionBloc.add(
+                    ChangeTextStyleEvent(
+                      text: currentText?.copyWith(
+                          textStyle:
+                              currentText?.style?.copyWith(color: value)),
+                    ),
+                  );
+                }, Colors.black, currentText?.style?.color);
+              },
+              icon: Icons.format_color_text_outlined,
+            ),
 
             AppIconButton(
-              backgroundColor: (currentText?.style?.backgroundColor
-                          ?.compare(Colors.yellow) ??
-                      false)
-                  .color,
+              iconColor: currentText?.style?.color,
+              backgroundColor: currentText?.style?.backgroundColor,
               icon: Icons.format_color_fill_outlined,
               onPresed: () {
-                _textDescriptionBloc.add(
-                  ChangeTextStyleEvent(
-                    text: currentText?.copyWith(
-                        textStyle: currentText?.style?.copyWith(
-                            backgroundColor: (currentText
-                                        ?.style?.backgroundColor
-                                        ?.compare(Colors.yellow) ??
-                                    false)
-                                ? Colors.transparent
-                                : Colors.yellow)),
-                  ),
-                );
+                _showColorPickerDialogue(state, context, (value) {
+                  _textDescriptionBloc.add(
+                    ChangeTextStyleEvent(
+                      text: currentText?.copyWith(
+                          textStyle: currentText?.style
+                              ?.copyWith(backgroundColor: value)),
+                    ),
+                  );
+                }, Colors.black, currentText?.style?.color);
               },
             ),
           ],
@@ -450,56 +483,6 @@ class _HomePageState extends State<HomePage> {
       text,
       style: const TextStyle(
           fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey),
-    );
-  }
-}
-
-extension SelectedFormatterBackgroundColor on bool {
-  Color get color => this ? Colors.grey : Colors.white;
-}
-
-extension ColorCompare on Color? {
-  bool compare(Color? other) {
-    return this?.alpha == other?.alpha &&
-        this?.blue == other?.blue &&
-        this?.green == other?.green &&
-        this?.red == other?.red &&
-        this?.opacity == other?.opacity;
-  }
-}
-
-extension TextCopyWithFormat on Text {
-  Text copyWith({
-    String? text,
-    Locale? tLocale,
-    int? tMaxLines,
-    TextOverflow? tOverflow,
-    Color? tSelectionColor,
-    bool? tSoftWrap,
-    StrutStyle? tStructStyle,
-    TextAlign? tTextAlign,
-    String? tSemanticLabel,
-    TextDirection? tTextDirection,
-    TextHeightBehavior? tTextHeightBehaviour,
-    double? tTextScaleFactor,
-    TextWidthBasis? tTextWidthBasis,
-    TextStyle? textStyle,
-  }) {
-    return Text(
-      text ?? data ?? '',
-      locale: tLocale ?? locale,
-      maxLines: tMaxLines ?? maxLines,
-      overflow: tOverflow ?? overflow,
-      selectionColor: tSelectionColor ?? selectionColor,
-      softWrap: tSoftWrap ?? softWrap,
-      strutStyle: tStructStyle ?? strutStyle,
-      textAlign: tTextAlign ?? textAlign,
-      textDirection: tTextDirection ?? textDirection,
-      semanticsLabel: tSemanticLabel ?? semanticsLabel,
-      textHeightBehavior: tTextHeightBehaviour ?? textHeightBehavior,
-      textScaleFactor: tTextScaleFactor ?? textScaleFactor,
-      textWidthBasis: tTextWidthBasis ?? textWidthBasis,
-      style: textStyle ?? style,
     );
   }
 }
