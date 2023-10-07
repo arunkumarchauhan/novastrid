@@ -270,6 +270,7 @@ class _HomePageState extends State<HomePage> {
         return Wrap(
           runAlignment: WrapAlignment.start,
           runSpacing: 10,
+          crossAxisAlignment: WrapCrossAlignment.center,
           children: [
             // AppTextButton(onPresed: () {}, text: "B"),
             AppImageButton(
@@ -391,6 +392,64 @@ class _HomePageState extends State<HomePage> {
                   ),
                 );
               },
+            ),
+
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(2),
+                border: Border.all(
+                  color: Colors.black,
+                ),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  AppIconButton(
+                      height: 30,
+                      onPresed: () {
+                        double fontSize =
+                            ((currentText?.style?.fontSize ?? 14) + 1);
+                        _textDescriptionBloc.add(
+                          ChangeTextStyleEvent(
+                            text: currentText?.copyWith(
+                              textStyle: currentText?.style?.copyWith(
+                                fontSize: fontSize,
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                      icon: Icons.keyboard_arrow_up_outlined),
+                  Text(
+                    "${currentText?.style?.fontSize ?? 14}",
+                    style: const TextStyle(
+                        fontSize: 14, fontWeight: FontWeight.bold),
+                  ),
+                  AppIconButton(
+                      height: 30,
+                      onPresed: () {
+                        double fontSize =
+                            (currentText?.style?.fontSize ?? 14) - 1;
+                        if (fontSize <= 0) {
+                          fontSize = 1;
+                        }
+
+                        _textDescriptionBloc.add(
+                          ChangeTextStyleEvent(
+                            text: currentText?.copyWith(
+                              textStyle: currentText?.style?.copyWith(
+                                fontSize: fontSize,
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                      icon: Icons.keyboard_arrow_down_outlined),
+                ],
+              ),
             ),
 
             AppImageButton(

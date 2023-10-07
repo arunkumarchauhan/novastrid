@@ -7,17 +7,19 @@ class AppIconButton extends StatelessWidget {
     required this.icon,
     this.backgroundColor,
     this.iconColor,
+    this.height,
   });
   final Function onPresed;
   final IconData icon;
   final Color? backgroundColor;
   final Color? iconColor;
+  final double? height;
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () => onPresed(),
       child: Container(
-        height: 30,
+        height: height ?? 30,
         width: 36,
         margin: const EdgeInsets.symmetric(horizontal: 3),
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
