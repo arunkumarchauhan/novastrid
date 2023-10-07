@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:novastrid/feature/home/bloc/home_bloc.dart';
-import 'package:novastrid/feature/home/presentation/home_page.dart';
+import 'package:novastrid/feature/home/bloc/home_bloc/home_bloc.dart';
+import 'package:novastrid/feature/home/bloc/text_description_bloc/bloc/text_description_bloc.dart';
+
 import 'package:novastrid/navigation/route_generator.dart';
 import 'package:novastrid/navigation/routes_path.dart';
 
@@ -18,6 +19,9 @@ class MyApp extends StatelessWidget {
       providers: [
         BlocProvider<HomeBloc>(
           create: (context) => HomeBloc(),
+        ),
+        BlocProvider<TextDescriptionBloc>(
+          create: (context) => TextDescriptionBloc(),
         )
       ],
       child: MaterialApp(

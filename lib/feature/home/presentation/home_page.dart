@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:desktop_drop/desktop_drop.dart';
 import 'package:dotted_border/dotted_border.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:novastrid/common/ui/widgets/app_icon_button.dart';
@@ -10,10 +9,10 @@ import 'package:novastrid/common/ui/widgets/app_image_button.dart';
 import 'package:novastrid/common/ui/widgets/app_swich.dart';
 import 'package:novastrid/common/ui/widgets/app_text_button.dart';
 import 'package:novastrid/common/ui/widgets/app_text_field.dart';
-import 'package:novastrid/feature/home/bloc/home_bloc.dart';
+import 'package:novastrid/feature/home/bloc/home_bloc/home_bloc.dart';
+import 'package:novastrid/feature/home/bloc/text_description_bloc/bloc/text_description_bloc.dart';
 import 'package:novastrid/utils/app_colors.dart';
 import 'package:novastrid/utils/assets.dart';
-import 'package:novastrid/utils/file_saver.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -26,9 +25,12 @@ class _HomePageState extends State<HomePage> {
   final TextEditingController _descriptionTextController =
       TextEditingController();
   late HomeBloc _homeBloc;
+  late TextDescriptionBloc _textDescriptionBloc;
+  Text? currentText;
   @override
   void initState() {
     super.initState();
+    _textDescriptionBloc = BlocProvider.of<TextDescriptionBloc>(context);
     _homeBloc = BlocProvider.of<HomeBloc>(context);
   }
 
@@ -76,9 +78,19 @@ class _HomePageState extends State<HomePage> {
                       child: _buildTextFormatterSection(),
                     ),
                   ),
-                  AppTextField(
-                    controller: _descriptionTextController,
-                    maxLines: 6,
+                  BlocBuilder<TextDescriptionBloc, TextDescriptionState>(
+                    builder: (context, state) {
+                      if (state is ChangeTextDescriptionStyleState) {
+                        currentText = state.text;
+                      }
+
+                      return AppTextField(
+                        controller: _descriptionTextController,
+                        maxLines: 6,
+                        textStyle: currentText?.style,
+                        textAlign: currentText?.textAlign,
+                      );
+                    },
                   ),
                 ],
               ),
@@ -224,57 +236,175 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  Wrap _buildTextFormatterSection() {
-    return Wrap(
-      runAlignment: WrapAlignment.start,
-      runSpacing: 10,
-      children: [
-        // AppTextButton(onPresed: () {}, text: "B"),
-        AppImageButton(
-          imagePath: Assets.bold,
-          onPresed: () {},
-        ),
-        AppImageButton(
-          imagePath: Assets.italic,
-          onPresed: () {},
-        ),
-        AppImageButton(
-          imagePath: Assets.underline,
-          onPresed: () {},
-        ),
-        AppImageButton(
-          imagePath: Assets.strikeThrough,
-          onPresed: () {},
-        ),
-        AppImageButton(
-          imagePath: Assets.alignLeft,
-          onPresed: () {},
-        ),
-        AppImageButton(
-          imagePath: Assets.alighCenter,
-          onPresed: () {},
-        ),
-        AppImageButton(
-          imagePath: Assets.alignRight,
-          onPresed: () {},
-        ),
-        AppImageButton(
-          imagePath: Assets.numberedList,
-          onPresed: () {},
-        ),
-        AppImageButton(
-          imagePath: Assets.bulletedList,
-          onPresed: () {},
-        ),
-        AppImageButton(
-          imagePath: Assets.textColor,
-          onPresed: () {},
-        ),
-        AppIconButton(
-          icon: Icons.format_color_fill_outlined,
-          onPresed: () {},
-        ),
-      ],
+  Widget _buildTextFormatterSection() {
+    return BlocBuilder<TextDescriptionBloc, TextDescriptionState>(
+      builder: (context, state) {
+        if (state is ChangeTextDescriptionStyleState) {
+          currentText = state.text;
+        }
+        return Wrap(
+          runAlignment: WrapAlignment.start,
+          runSpacing: 10,
+          children: [
+            // AppTextButton(onPresed: () {}, text: "B"),
+            AppImageButton(
+              imagePath: Assets.bold,
+              backgroundColor:
+                  (currentText?.style?.fontWeight == FontWeight.bold).color,
+              onPresed: () {
+                _textDescriptionBloc.add(
+                  ChangeTextStyleEvent(
+                    text: currentText?.copyWith(
+                        textStyle: currentText?.style?.copyWith(
+                      fontWeight:
+                          currentText?.style?.fontWeight == FontWeight.bold
+                              ? FontWeight.normal
+                              : FontWeight.bold,
+                    )),
+                  ),
+                );
+              },
+            ),
+            AppImageButton(
+              backgroundColor:
+                  (currentText?.style?.fontStyle == FontStyle.italic).color,
+              imagePath: Assets.italic,
+              onPresed: () {
+                _textDescriptionBloc.add(
+                  ChangeTextStyleEvent(
+                    text: currentText?.copyWith(
+                        textStyle: currentText?.style?.copyWith(
+                      fontStyle:
+                          currentText?.style?.fontStyle == FontStyle.italic
+                              ? FontStyle.normal
+                              : FontStyle.italic,
+                    )),
+                  ),
+                );
+              },
+            ),
+            AppImageButton(
+              backgroundColor:
+                  (currentText?.style?.decoration == TextDecoration.underline)
+                      .color,
+              imagePath: Assets.underline,
+              onPresed: () {
+                _textDescriptionBloc.add(
+                  ChangeTextStyleEvent(
+                    text: currentText?.copyWith(
+                        textStyle: currentText?.style?.copyWith(
+                      decoration: (currentText?.style?.decoration ==
+                              TextDecoration.underline)
+                          ? TextDecoration.none
+                          : TextDecoration.underline,
+                    )),
+                  ),
+                );
+              },
+            ),
+            AppImageButton(
+              backgroundColor:
+                  (currentText?.style?.decoration == TextDecoration.lineThrough)
+                      .color,
+              imagePath: Assets.strikeThrough,
+              onPresed: () {
+                _textDescriptionBloc.add(
+                  ChangeTextStyleEvent(
+                    text: currentText?.copyWith(
+                        textStyle: currentText?.style?.copyWith(
+                      decoration: (currentText?.style?.decoration ==
+                              TextDecoration.lineThrough)
+                          ? TextDecoration.none
+                          : TextDecoration.lineThrough,
+                    )),
+                  ),
+                );
+              },
+            ),
+            AppImageButton(
+              backgroundColor:
+                  (currentText?.textAlign?.index == TextAlign.left.index).color,
+              imagePath: Assets.alignLeft,
+              onPresed: () {
+                _textDescriptionBloc.add(
+                  ChangeTextStyleEvent(
+                    text: currentText?.copyWith(
+                        tTextAlign: (currentText?.textAlign?.index ==
+                                TextAlign.left.index)
+                            ? TextAlign.center
+                            : TextAlign.left),
+                  ),
+                );
+              },
+            ),
+            AppImageButton(
+              backgroundColor:
+                  (currentText?.textAlign == TextAlign.center).color,
+              imagePath: Assets.alighCenter,
+              onPresed: () {
+                _textDescriptionBloc.add(
+                  ChangeTextStyleEvent(
+                    text: currentText?.copyWith(
+                        tTextAlign: (currentText?.textAlign == TextAlign.center)
+                            ? TextAlign.left
+                            : TextAlign.center),
+                  ),
+                );
+              },
+            ),
+            AppImageButton(
+              backgroundColor:
+                  (currentText?.textAlign == TextAlign.right).color,
+              imagePath: Assets.alignRight,
+              onPresed: () {
+                _textDescriptionBloc.add(
+                  ChangeTextStyleEvent(
+                    text: currentText?.copyWith(
+                        tTextAlign: (currentText?.textAlign == TextAlign.right)
+                            ? TextAlign.left
+                            : TextAlign.right),
+                  ),
+                );
+              },
+            ),
+
+            AppImageButton(
+              onPresed: () {},
+              imagePath: Assets.numberedList,
+            ),
+
+            AppImageButton(
+              onPresed: () {},
+              imagePath: Assets.bulletedList,
+            ),
+
+            AppIconButton(
+                onPresed: () {}, icon: Icons.format_color_text_outlined),
+
+            AppIconButton(
+              backgroundColor: (currentText?.style?.backgroundColor
+                          ?.compare(Colors.yellow) ??
+                      false)
+                  .color,
+              icon: Icons.format_color_fill_outlined,
+              onPresed: () {
+                _textDescriptionBloc.add(
+                  ChangeTextStyleEvent(
+                    text: currentText?.copyWith(
+                        textStyle: currentText?.style?.copyWith(
+                            backgroundColor: (currentText
+                                        ?.style?.backgroundColor
+                                        ?.compare(Colors.yellow) ??
+                                    false)
+                                ? Colors.transparent
+                                : Colors.yellow)),
+                  ),
+                );
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -320,6 +450,56 @@ class _HomePageState extends State<HomePage> {
       text,
       style: const TextStyle(
           fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey),
+    );
+  }
+}
+
+extension SelectedFormatterBackgroundColor on bool {
+  Color get color => this ? Colors.grey : Colors.white;
+}
+
+extension ColorCompare on Color? {
+  bool compare(Color? other) {
+    return this?.alpha == other?.alpha &&
+        this?.blue == other?.blue &&
+        this?.green == other?.green &&
+        this?.red == other?.red &&
+        this?.opacity == other?.opacity;
+  }
+}
+
+extension TextCopyWithFormat on Text {
+  Text copyWith({
+    String? text,
+    Locale? tLocale,
+    int? tMaxLines,
+    TextOverflow? tOverflow,
+    Color? tSelectionColor,
+    bool? tSoftWrap,
+    StrutStyle? tStructStyle,
+    TextAlign? tTextAlign,
+    String? tSemanticLabel,
+    TextDirection? tTextDirection,
+    TextHeightBehavior? tTextHeightBehaviour,
+    double? tTextScaleFactor,
+    TextWidthBasis? tTextWidthBasis,
+    TextStyle? textStyle,
+  }) {
+    return Text(
+      text ?? data ?? '',
+      locale: tLocale ?? locale,
+      maxLines: tMaxLines ?? maxLines,
+      overflow: tOverflow ?? overflow,
+      selectionColor: tSelectionColor ?? selectionColor,
+      softWrap: tSoftWrap ?? softWrap,
+      strutStyle: tStructStyle ?? strutStyle,
+      textAlign: tTextAlign ?? textAlign,
+      textDirection: tTextDirection ?? textDirection,
+      semanticsLabel: tSemanticLabel ?? semanticsLabel,
+      textHeightBehavior: tTextHeightBehaviour ?? textHeightBehavior,
+      textScaleFactor: tTextScaleFactor ?? textScaleFactor,
+      textWidthBasis: tTextWidthBasis ?? textWidthBasis,
+      style: textStyle ?? style,
     );
   }
 }

@@ -39,13 +39,14 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         FilePickerResult? result = await FilePicker.platform.pickFiles();
 
         if (result != null) {
-          final Uint8List byteData = result.files.single.bytes!;
+          Uint8List? tempByteData = result.files.single.bytes;
+          tempByteData ??= await File(result.files.single.path!).readAsBytes();
           String fileName = result.files.single.name;
           selectedFileName = fileName;
-          selectedFileBytes = byteData;
+          selectedFileBytes = tempByteData;
           emit(
             DocUploadSuccessfulState(
-              fileBytes: byteData,
+              fileBytes: tempByteData,
               fileName: fileName,
             ),
           );
@@ -58,6 +59,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
           emit(DocUploadFailedState(error: "Document Upload Failed"));
         }
       } catch (e) {
+        debugPrint("Ecxception in PickFileEvent $e");
         emit(DocUploadFailedState(error: "Document Upload Failed"));
       }
     });

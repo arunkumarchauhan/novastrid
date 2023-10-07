@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 
 class AppIconButton extends StatelessWidget {
-  const AppIconButton({
-    super.key,
-    required this.onPresed,
-    required this.icon,
-  });
+  const AppIconButton(
+      {super.key,
+      required this.onPresed,
+      required this.icon,
+      this.backgroundColor});
   final Function onPresed;
   final IconData icon;
-
+  final Color? backgroundColor;
   @override
   Widget build(BuildContext context) {
     return InkWell(
@@ -17,7 +17,7 @@ class AppIconButton extends StatelessWidget {
         height: 30,
         width: 36,
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
-        color: Colors.white,
+        color: backgroundColor ?? Colors.white,
         child: Icon(
           icon,
           color: Colors.black,

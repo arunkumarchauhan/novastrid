@@ -5,9 +5,11 @@ class AppImageButton extends StatelessWidget {
     super.key,
     required this.onPresed,
     required this.imagePath,
+    this.backgroundColor,
   });
   final Function onPresed;
   final String imagePath;
+  final Color? backgroundColor;
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +19,7 @@ class AppImageButton extends StatelessWidget {
         height: 30,
         width: 36,
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
-        color: Colors.white,
+        color: backgroundColor ?? Colors.white,
         child: Image.asset(
           imagePath,
           height: 20,
