@@ -5,7 +5,7 @@ A new Flutter project.
 ## Getting Started
 ### This project is just for demo purpose only .By any means it does not represent full fledge production level architecture.
 
-This project has been Tested on web (chrome) and android ios and macos.
+This project has been Tested on web (chrome) and android ios and macos emulator/simulators.
 
 
 
